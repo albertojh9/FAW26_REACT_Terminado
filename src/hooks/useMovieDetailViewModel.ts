@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Movie } from '../models/movie';
 import { URL_BACKEND_DETAILS } from '../services/environment';
-import { isFavoriteMovie, setFavoriteMovie } from '../services/favoritesStore';
 
 interface UseMovieDetailViewModelReturn {
   movie: Movie | null;
   loading: boolean;
   error: string | null;
-  toggleFavorite: () => void;
   deleteMovie: () => Promise<void>;
 }
 
@@ -38,8 +36,7 @@ export function useMovieDetailViewModel(id: number): UseMovieDetailViewModelRetu
           data.genre,
           data.description,
           data.rating,
-          data.poster_url,
-          isFavoriteMovie(data.id)
+          data.poster_url
         );
         setMovie(loadedMovie);
       } catch (err) {
@@ -53,16 +50,6 @@ export function useMovieDetailViewModel(id: number): UseMovieDetailViewModelRetu
     loadMovie();
   }, [id]);
 
-  // Toggle de favorito
-  const toggleFavorite = () => {
-    setMovie((prevMovie) => {
-      if (!prevMovie) return null;
-      const nextValue = !prevMovie.isFavorite;
-      setFavoriteMovie(prevMovie.id, nextValue);
-      return { ...prevMovie, isFavorite: nextValue };
-    });
-  };
-
   // Eliminar película
   const deleteMovie = async () => {
     if (!movie) return;
@@ -74,7 +61,6 @@ export function useMovieDetailViewModel(id: number): UseMovieDetailViewModelRetu
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      setFavoriteMovie(movie.id, false);
       setMovie(null);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : 'Error al eliminar película';
@@ -87,7 +73,6 @@ export function useMovieDetailViewModel(id: number): UseMovieDetailViewModelRetu
     movie,
     loading,
     error,
-    toggleFavorite,
     deleteMovie,
   };
 }

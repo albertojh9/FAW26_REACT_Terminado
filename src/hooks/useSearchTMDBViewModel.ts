@@ -8,7 +8,6 @@ interface UseSearchTMDBViewModelReturn {
   error: string | null;
   searchById: (id: string) => Promise<void>;
   searchByQuery: (query: string) => Promise<void>;
-  saveMovie: (movie: Movie) => Promise<boolean>;
   clearResults: () => void;
 }
 
@@ -72,42 +71,6 @@ export function useSearchTMDBViewModel(): UseSearchTMDBViewModelReturn {
     }
   };
 
-  // Guardar película en el catálogo local
-  const saveMovie = async (movie: Movie): Promise<boolean> => {
-    try {
-      const response = await fetch('http://localhost:5000/api/movies', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: movie.title,
-          director: movie.director,
-          year: movie.year,
-          genre: movie.genre,
-          description: movie.description,
-          rating: movie.rating,
-          poster_url: movie.poster_url,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || `Error: ${response.status}`);
-      }
-
-      // Remover de resultados si ya estaba
-      setResults((prevResults) =>
-        prevResults.filter((m) => m.id !== movie.id)
-      );
-
-      return true;
-    } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Error al guardar película';
-      setError(errorMsg);
-      console.error('Error saving movie:', err);
-      return false;
-    }
-  };
-
   // Limpiar resultados
   const clearResults = () => {
     setResults([]);
@@ -120,7 +83,6 @@ export function useSearchTMDBViewModel(): UseSearchTMDBViewModelReturn {
     error,
     searchById,
     searchByQuery,
-    saveMovie,
     clearResults,
   };
 }

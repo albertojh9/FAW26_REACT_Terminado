@@ -1,14 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Movie } from '../models/movie';
 import { URL_BACKEND } from '../services/environment';
-import { applyFavoritesToMovies, isFavoriteMovie, setFavoriteMovie } from '../services/favoritesStore';
 
 interface UseMoviesViewModelReturn {
   movies: Movie[];
   loading: boolean;
   error: string | null;
   deleteMovie: (id: number) => Promise<void>;
-  toggleFavorite: (id: number) => void;
   addMovie: (movie: Movie) => void;
   refreshMovies: () => Promise<void>;
 }
@@ -44,13 +42,12 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
             item.genre,
             item.description,
             item.rating,
-            item.poster_url,
-            isFavoriteMovie(item.id)
+            item.poster_url
           )
       );
 
       // Solo mostrar películas del backend local
-      setMovies(applyFavoritesToMovies(localMovies));
+      setMovies(localMovies);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar películas');
       console.error('Error loading movies:', err);
@@ -74,7 +71,6 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      setFavoriteMovie(id, false);
       // Actualizar estado local
       setMovies((prevMovies) => prevMovies.filter((m) => m.id !== id));
     } catch (err) {
@@ -82,22 +78,6 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
       setError(errorMsg);
       console.error('Error deleting movie:', err);
     }
-  };
-
-  // Toggle de favorito
-  const toggleFavorite = (id: number) => {
-    setMovies((prevMovies) => {
-      const updatedMovies = prevMovies.map((movie) =>
-        movie.id === id ? { ...movie, isFavorite: !movie.isFavorite } : movie
-      );
-
-      const targetMovie = updatedMovies.find((movie) => movie.id === id);
-      if (targetMovie) {
-        setFavoriteMovie(id, Boolean(targetMovie.isFavorite));
-      }
-
-      return updatedMovies;
-    });
   };
 
   // Añadir una nueva película (desde TMDB)
@@ -114,7 +94,7 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
         return prevMovies;
       }
       
-      return applyFavoritesToMovies([movie, ...prevMovies]);
+      return [movie, ...prevMovies];
     });
   };
 
@@ -128,7 +108,6 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
     loading,
     error,
     deleteMovie,
-    toggleFavorite,
     addMovie,
     refreshMovies,
   };

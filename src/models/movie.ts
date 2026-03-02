@@ -7,9 +7,8 @@ export class Movie{
     description : string = 'mock description';
     rating : number = 0.0;
     poster_url : string = 'mock poster';
-    isFavorite : boolean = false;
 
-    constructor(id : number, title : string, director : string, year : number, genre : string, description : string, rating : number, poster_url : string, isFavorite : boolean = false){
+    constructor(id : number, title : string, director : string, year : number, genre : string, description : string, rating : number, poster_url : string){
         this.id = id;
         this.title = title;
         this.director = director;
@@ -18,6 +17,5 @@ export class Movie{
         this.description = description;
         this.rating = rating;
         this.poster_url = poster_url;
-        this.isFavorite = isFavorite;
     }
 }

@@ -7,7 +7,7 @@ const MovieDetailPage : FC = ()=>{
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const movieId = Number.parseInt(id ?? '', 10);
-    const { movie, loading, error, toggleFavorite, deleteMovie } = useMovieDetailViewModel(movieId);
+    const { movie, loading, error, deleteMovie } = useMovieDetailViewModel(movieId);
 
     const handleDelete = async () => {
         if (window.confirm('¿Estás seguro de que deseas eliminar esta película?')) {
@@ -46,13 +46,6 @@ const MovieDetailPage : FC = ()=>{
                 <div className="col-md-4 mb-4">
                     <img src={movie.poster_url} 
              className="img-fluid rounded shadow" alt={ movie.title}></img>
-                    <button 
-                        className={`btn w-100 mt-3 ${movie.isFavorite ? 'btn-danger' : 'btn-outline-danger'}`}
-                        onClick={toggleFavorite}
-                    >
-                        <i className={`fas fa-heart me-2 ${movie.isFavorite ? '' : 'far'}`}></i>
-                        {movie.isFavorite ? 'Favorita' : 'Añadir a favoritos'}
-                    </button>
                 </div>
                 <div className="col-md-8">
                     <h1>{ movie.title }</h1>

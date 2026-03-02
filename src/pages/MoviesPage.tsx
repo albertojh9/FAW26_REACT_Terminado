@@ -7,7 +7,7 @@ import MovieCard from '../components/MovieCard';
 
 const MoviesPage : FC = ()=>{
     // Usar el ViewModel para gestionar el estado
-    const { movies, loading, error, deleteMovie, toggleFavorite } = useMoviesViewModel();
+    const { movies, loading, error, deleteMovie } = useMoviesViewModel();
 
     const handleDelete = async (id: number) => {
         if (window.confirm('¿Estás seguro de que deseas eliminar esta película?')) {
@@ -48,7 +48,6 @@ const MoviesPage : FC = ()=>{
                             movie={movie} 
                             showDetails 
                             onDelete={() => handleDelete(movie.id)}
-                            onToggleFavorite={() => toggleFavorite(movie.id)}
                         />
                     </div>
                 ))}

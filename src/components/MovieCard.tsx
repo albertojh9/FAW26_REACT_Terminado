@@ -9,29 +9,16 @@ interface MovieCardProps {
   movie: Movie;
   showDetails?: boolean;
   onDelete?: () => void;
-  onToggleFavorite?: () => void;
 }
 
 const MovieCard: FC<MovieCardProps> = ({ 
   movie, 
   showDetails = false,
-  onDelete,
-  onToggleFavorite 
+  onDelete
 }) => {
   return (
     <div className="card h-100 movie-card">
       <div className="card-body d-flex flex-column position-relative">
-        {onToggleFavorite && (
-          <button
-            className={`btn btn-sm position-absolute top-0 end-0 m-2 ${
-              movie.isFavorite ? 'btn-danger' : 'btn-outline-danger'
-            }`}
-            onClick={onToggleFavorite}
-            title={movie.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritos'}
-          >
-            <i className={`fas fa-heart ${movie.isFavorite ? 'fas' : 'far'}`}></i>
-          </button>
-        )}
         
         <img src={movie.poster_url} alt={movie.title} className="card-img-top mb-3" height="300px" />
         <h5 className="card-title">{movie.title}</h5>
@@ -69,5 +56,4 @@ export default MovieCard;
 // - Usa los campos del modelo Movie.
 // - Adapta el nombre del campo poster_url/poster según la fuente de datos.
 // - Puedes añadir más detalles visuales si lo necesitas.
-// - onDelete y onToggleFavorite son callbacks opcionales para manejar acciones
-// - onToggleFavorite muestra el icono de corazón para favoritos
+// - onDelete es callback opcional para manejar eliminación de películas

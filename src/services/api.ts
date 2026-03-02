@@ -15,7 +15,6 @@ type MovieApi = {
     description: string;
     rating: number;
     poster_url: string;
-    isFavorite?: boolean;
 };
 
 function toMovie(item: MovieApi): Movie {

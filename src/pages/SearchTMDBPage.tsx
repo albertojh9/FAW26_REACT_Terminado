@@ -3,11 +3,10 @@ import { FC, useState } from 'react';
 import { useSearchTMDBViewModel } from '../hooks/useSearchTMDBViewModel';
 
 const SearchTMDBPage: FC = () => {
-  const { results, loading, error, searchById, searchByQuery, saveMovie, clearResults } =
+  const { results, loading, error, searchById, searchByQuery, clearResults } =
     useSearchTMDBViewModel();
   const [searchInput, setSearchInput] = useState('');
   const [searchType, setSearchType] = useState<'id' | 'text'>('id');
-  const [savedMovies, setSavedMovies] = useState<number[]>([]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,20 +19,9 @@ const SearchTMDBPage: FC = () => {
     }
   };
 
-  const handleSaveMovie = async (movieId: number) => {
-    const movieToSave = results.find((m) => m.id === movieId);
-    if (!movieToSave) return;
-
-    const success = await saveMovie(movieToSave);
-    if (success) {
-      setSavedMovies((prev) => [...prev, movieId]);
-    }
-  };
-
   const handleClear = () => {
     clearResults();
     setSearchInput('');
-    setSavedMovies([]);
   };
 
   return (
@@ -43,7 +31,7 @@ const SearchTMDBPage: FC = () => {
           <i className="fas fa-search me-2"></i>Buscar en TMDB
         </h1>
         <p className="text-muted">
-          Busca películas en The Movie Database y ágregalas a tu catálogo local
+          Busca películas en The Movie Database
         </p>
       </div>
 
@@ -145,29 +133,15 @@ const SearchTMDBPage: FC = () => {
       {!loading && results.length > 0 && (
         <>
           <div className="mb-4">
-            <div className="d-flex justify-content-between align-items-center">
-              <h3>
-                <i className="fas fa-film me-2"></i>Resultados ({results.length})
-              </h3>
-              <span className="badge bg-success">
-                {savedMovies.length} guardadas
-              </span>
-            </div>
+            <h3>
+              <i className="fas fa-film me-2"></i>Resultados ({results.length})
+            </h3>
           </div>
 
           <div className="row">
-            {results.map((movie) => {
-              const isSaved = savedMovies.includes(movie.id);
-              return (
+            {results.map((movie) => (
                 <div className="col-md-6 col-lg-4 mb-4" key={movie.id}>
-                  <div className="card h-100 movie-card position-relative">
-                    {isSaved && (
-                      <div className="position-absolute top-0 end-0 m-2">
-                        <span className="badge bg-success">
-                          <i className="fas fa-check me-1"></i>Guardada
-                        </span>
-                      </div>
-                    )}
+                  <div className="card h-100 movie-card">
                     <div className="card-body d-flex flex-column">
                       <img
                         src={movie.poster_url}
@@ -197,29 +171,10 @@ const SearchTMDBPage: FC = () => {
                       <p className="card-text flex-grow-1 small">
                         {movie.description.substring(0, 100)}...
                       </p>
-                      <div className="d-grid gap-2 mt-auto">
-                        <button
-                          className={`btn ${
-                            isSaved
-                              ? 'btn-outline-success'
-                              : 'btn-outline-primary'
-                          }`}
-                          onClick={() => handleSaveMovie(movie.id)}
-                          disabled={isSaved}
-                        >
-                          <i
-                            className={`fas ${
-                              isSaved ? 'fa-check' : 'fa-save'
-                            } me-2`}
-                          ></i>
-                          {isSaved ? 'Guardada' : 'Guardar'}
-                        </button>
-                      </div>
                     </div>
                   </div>
                 </div>
-              );
-            })}
+            ))}
           </div>
         </>
       )}
