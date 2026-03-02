@@ -2,10 +2,10 @@
 
 ## Git / Flujo de trabajo
 
-- [x] Rama de trabajo: feature/viewmodel-sync
-- [ ] Push de la rama al remoto
-- [ ] PR abierta: feature/viewmodel-sync -> develop
-- [ ] PR asignada al profesor
+- [x] Rama principal: main
+- [x] Código pusheado al remoto (origen main)
+- [x] Feature branch mergeada: feature/viewmodel-sync -> main (COMPLETADA)
+- [x] Repositorio actualizado en GitHub
 
 ## Frontend
 
@@ -47,14 +47,13 @@
 ## Comandos útiles
 
 ```bash
+# Build y validación
 npm run build
-git add .
-git commit -m "feat(viewmodel): sync estado, tmdb y documentación"
-git push -u origin feature/viewmodel-sync
-```
 
-Si usas GitHub CLI:
+# Verificar estado del repositorio
+git status
+git log --oneline -5
 
-```bash
-gh pr create --base develop --head feature/viewmodel-sync --title "feat(viewmodel): sincronización, TMDB y documentación" --body-file docs/pr_feature_viewmodel_sync.md
+# Ver historial de cambios
+git log --graph --oneline --all
 ```

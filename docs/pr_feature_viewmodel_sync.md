@@ -1,6 +1,8 @@
-# PR: feature/viewmodel-sync -> develop
+# 📋 Registro Histórico: feature/viewmodel-sync -> main
 
-## Título sugerido
+**Estado**: ✅ MERGEADO A MAIN (2026-03-02)
+
+## Título del Merge
 
 feat(viewmodel): sincronización entre pantallas, integración TMDB y mejora de documentación
 
@@ -59,9 +61,11 @@ Esta PR completa la implementación del patrón ViewModel con Custom Hooks en fr
 
 ## Validación de requisitos de revisión previa
 
-- Se trabaja en rama feature/viewmodel-sync.
-- Se documenta explícitamente la relación con backend.
-- Se refleja el trabajo en changelog y README.
+- ✅ Se trabajó en rama feature/viewmodel-sync.
+- ✅ Se documentó explícitamente la relación con backend.
+- ✅ Se refleja el trabajo en changelog y README.
+- ✅ Rama mergeada exitosamente a main.
+- ✅ Todo el código disponible en rama principal.
 
 ## Nota de seguridad
 

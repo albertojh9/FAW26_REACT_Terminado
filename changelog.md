@@ -3,11 +3,49 @@
 Todos los cambios notables en este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.4] - 2026-03-02
+
+### 🔧 Corrección de Duplicados en Base de Datos
+
+#### Problema Solucionado
+- **Duplicación masiva**: Se detectaron 41 registros duplicados de las 2 películas de muestra
+- **Causa raíz 1**: Falta de constraint UNIQUE en la tabla movies permitía inserciones repetidas al reiniciar Flask
+- **Causa raíz 2**: Ruta relativa de base de datos creaba múltiples archivos proyecto.db en diferentes ubicaciones
+- **Múltiples instancias**: Varios procesos Python corriendo simultáneamente usaban bases de datos diferentes
+
+#### Solución Implementada
+- **`backend/models.py`**: Agregado constraint `UNIQUE(title, year)` a la tabla movies
+  - Previene duplicados automáticamente a nivel de base de datos
+  - `INSERT OR IGNORE` ahora funciona correctamente
+  - Eliminada lógica manual de limpieza de duplicados de `init_db()`
+  
+- **`backend/models.py`**: Cambiada ruta relativa a ruta absoluta
+  ```python
+  # Antes (problemático):
+  _database_path_file = 'proyecto.db'
+  
+  # Después (correcto):
+  _current_dir = os.path.dirname(os.path.abspath(__file__))
+  _database_path_file = os.path.join(_current_dir, 'proyecto.db')
+  ```
+  - Ahora siempre usa `Flask-backend/backend/proyecto.db` independiente del directorio de ejecución
+  - Elimina confusión entre múltiples archivos proyecto.db
+
+- **Limpieza de archivos**: Eliminada base de datos duplicada en `Flask-backend/proyecto.db` (41 películas)
+- **Limpieza de procesos**: Eliminados todos los procesos Flask zombies que causaban confusión
+
+#### Estado Final
+- ✅ Catálogo con **2 películas** sin duplicados
+- ✅ The Shawshank Redemption (1994)
+- ✅ The Godfather (1972)
+- ✅ Constraint UNIQUE previene futuras duplicaciones
+- ✅ Ruta absoluta de BD previene archivos duplicados
+
 ## [2.0.3] - 2026-03-02
 
-### 🎬 Ampliación del Catálogo
+### 🎬 Ampliación del Catálogo (REVERTIDO en v2.0.4)
 
-#### Datos de Muestra Expandidos
+#### Datos de Muestra Expandidos (ya no aplicable)
 - **`backend/models.py`**: Función `add_sample_movies()` actualizada
   - **50 películas icónicas** de diversos géneros y épocas
   - Incluye: Drama, Acción, Sci-Fi, Thriller, Animación, Comedia, Terror, Western, Musical
@@ -16,10 +54,7 @@ El formato está basado en [Keep a Changelog](https://keepachangelog.com/).
   - Base de datos limpia sin duplicados
   - Películas destacadas: The Shawshank Redemption, The Godfather, Inception, Parasite, Joker, entre otras
 
-#### Limpieza de Datos
-- Eliminación de duplicados previos
-- Base de datos recreada con datos consistentes
-- Verificación de integridad automática
+_Nota: Esta expansión causó problemas de duplicación y fue revertida para mantener solo las 2 películas originales._
 
 ## [2.0.2] - 2026-03-02
 
