@@ -1,0 +1,132 @@
+@startuml class_diagram
+!define FONTNAME Consolas
+!define FONTSIZE 11
+skinparam defaultFontName FONTNAME
+skinparam defaultFontSize FONTSIZE
+skinparam backgroundColor #F5F5F5
+skinparam classBorderColor #555
+
+package "Models" {
+    class Movie {
+        - id: number
+        - title: string
+        - director: string
+        - year: number
+        - genre: string
+        - description: string
+        - rating: number
+        - poster_url: string
+        - isFavorite: boolean
+        --
+        + constructor(...)
+    }
+}
+
+package "ViewModel Layer" {
+    interface IMovieRepository {
+        + getAll(): Promise<Movie[]>
+        + getById(id: number): Promise<Movie>
+        + create(movie: Movie): Promise<boolean>
+        + delete(id: number): Promise<boolean>
+        + update(movie: Movie): Promise<boolean>
+    }
+
+    class useMoviesViewModel {
+        - movies: Movie[]
+        - loading: boolean
+        - error: string | null
+        --
+        + deleteMovie(id: number): Promise<void>
+        + toggleFavorite(id: number): void
+        + addMovie(movie: Movie): void
+        + refreshMovies(): Promise<void>
+    }
+
+    class useMovieDetailViewModel {
+        - movie: Movie | null
+        - loading: boolean
+        - error: string | null
+        --
+        + toggleFavorite(): void
+        + deleteMovie(): Promise<void>
+    }
+
+    class useSearchTMDBViewModel {
+        - results: Movie[]
+        - loading: boolean
+        - error: string | null
+        --
+        + searchById(id: string): Promise<void>
+        + searchByQuery(query: string): Promise<void>
+        + saveMovie(movie: Movie): Promise<boolean>
+        + clearResults(): void
+    }
+
+    useMoviesViewModel --|> IMovieRepository
+    useMovieDetailViewModel --|> IMovieRepository
+    useSearchTMDBViewModel --|> IMovieRepository
+}
+
+package "Services Layer" {
+    class MovieAPIService {
+        - baseUrl: string
+        --
+        + getAll(): Promise<Movie[]>
+        + getById(id: number): Promise<Movie>
+        + create(movie: Movie): Promise<boolean>
+        + delete(id: number): Promise<boolean>
+    }
+
+    class TMDBService {
+        - apiKey: string
+        - baseUrl: string
+        --
+        + searchMoviesByTMDBId(id: string): Promise<Movie>
+        + searchMoviesByQuery(query: string): Promise<Movie[]>
+    }
+
+    MovieAPIService --|> IMovieRepository
+}
+
+package "Backend" {
+    class FlaskApp {
+        - models: Models
+        --
+        + GET /api/movies: Movie[]
+        + GET /api/movies/:id: Movie
+        + POST /api/movies: Movie
+        + DELETE /api/movies/:id: bool
+    }
+
+    class ModelsPY {
+        + get_all_movies(): list
+        + get_movie_by_id(id): dict
+        + create_movie(...): bool
+        + delete_movie(id): bool
+    }
+
+    FlaskApp --> ModelsPY
+    ModelsPY --> Movie
+}
+
+'Relaciones
+useMoviesViewModel ..> MovieAPIService
+useMovieDetailViewModel ..> MovieAPIService
+useSearchTMDBViewModel ..> MovieAPIService
+useSearchTMDBViewModel ..> TMDBService
+
+MovieAPIService ..> FlaskApp
+TMDBService --> "external API"
+
+note right of IMovieRepository
+  Interfaz que define operaciones
+  CRUD sobre películas
+end note
+
+note right of Movie
+  Modelo de datos de película
+  Sincronizado entre Frontend
+  y Backend
+end note
+
+@enduml

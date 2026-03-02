@@ -1,0 +1,114 @@
+@startuml architecture
+!define FONTNAME Consolas
+!define FONTSIZE 11
+skinparam defaultFontName FONTNAME
+skinparam defaultFontSize FONTSIZE
+skinparam backgroundColor #F5F5F5
+skinparam classBorderColor #555
+skinparam classBackgroundColor #E8F4F8
+
+package "Frontend (React)" #DEF0FF {
+    
+    package "Pages" #BBDDFF {
+        class HomePage
+        class MoviesPage
+        class MovieDetailPage
+        class SearchTMDBPage
+        class ContactPage
+        class AboutPage
+    }
+
+    package "Components" #BBDDFF {
+        class Layout
+        class Header
+        class MovieCard
+        class MovieList
+        class SearchBar
+        class FilterBar
+        class Footer
+    }
+
+    package "Hooks (ViewModels)" #BBFFBB {
+        class useMoviesViewModel
+        class useMovieDetailViewModel
+        class useSearchTMDBViewModel
+    }
+
+    package "Services" #FFFFBB {
+        class tmdbService
+        class api
+        class environment
+    }
+
+    package "Models" #FFE6E6 {
+        class Movie
+    }
+
+    package "Config" #FFE6E6 {
+        class tmdb
+    }
+
+    MoviesPage --> useMoviesViewModel
+    MovieDetailPage --> useMovieDetailViewModel
+    SearchTMDBPage --> useSearchTMDBViewModel
+    
+    useMoviesViewModel --> api
+    useMovieDetailViewModel --> api
+    useSearchTMDBViewModel --> tmdbService
+    
+    MovieCard --> Movie
+    MovieList --> MovieCard
+    MoviesPage --> MovieCard
+    SearchTMDBPage --> MovieCard
+    
+    tmdbService --> Movie
+    api --> Movie
+    tmdbService --> tmdb
+}
+
+package "External APIs" #FFE6E6 {
+    class "TMDB API" as TMDBAPI
+}
+
+package "Backend (Flask)" #FFF0E6 {
+    class Flask_App as "Flask App"
+    class models
+    class api_routes
+    
+    package "Database" #FFE6E6 {
+        class movies_table as "movies (SQLite)"
+        class contacts_table as "contacts (SQLite)"
+    }
+    
+    Flask_App --> api_routes
+    api_routes --> models
+    models --> movies_table
+    models --> contacts_table
+}
+
+'Conexiones externas
+tmdbService ..> TMDBAPI : "GET requests"
+api ..> Flask_App : "HTTP (fetch)"
+useSearchTMDBViewModel ..> Flask_App : "POST (save movies)"
+
+note right of useMoviesViewModel
+  - Gestiona lista de películas
+  - GET /api/movies
+  - DELETE /api/movies/:id
+  - Toggle favoritos
+end note
+
+note right of useMovieDetailViewModel
+  - Gestiona detalle de película
+  - GET /api/movies/:id
+  - DELETE /api/movies/:id
+  - Toggle favoritos
+end note
+
+note right of useSearchTMDBViewModel
+  - Búsqueda en TMDB
+  - Guardar desde TMDB
+  - POST /api/movies
+end note
+
+@enduml

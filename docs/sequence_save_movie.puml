@@ -1,0 +1,56 @@
+@startuml sequence_diagram
+!define FONTNAME Consolas
+!define FONTSIZE 11
+skinparam defaultFontName FONTNAME
+skinparam defaultFontSize FONTSIZE
+skinparam backgroundColor #F5F5F5
+
+actor "User" as user
+participant "SearchTMDBPage" as page
+participant "useSearchTMDBViewModel" as vm
+participant "tmdbService" as tmdb
+participant "TMDB API" as tmdbapi
+participant "MovieAPIService" as api
+participant "Flask Backend" as flask_app
+
+user ->> page: Buscar película ("238")
+page ->> vm: searchById("238")
+activate vm
+vm ->> tmdb: searchMoviesByTMDBId("238")
+activate tmdb
+tmdb ->> tmdbapi: GET /movie/238?api_key=...
+activate tmdbapi
+tmdbapi -->> tmdb: Movie data
+deactivate tmdbapi
+tmdb -->> vm: Movie (El Padrino)
+deactivate tmdb
+vm -->> page: [Movie]
+deactivate vm
+page ->> user: Mostrar resultados
+
+user ->> page: Guardar película
+page ->> vm: saveMovie(movie)
+activate vm
+vm ->> api: POST /api/movies
+activate api
+api ->> flask_app: POST /api/movies (JSON)
+activate flask_app
+flask_app ->> flask_app: create_movie()
+flask_app -->> api: 201 Created
+deactivate flask_app
+api -->> vm: true
+deactivate api
+vm -->> page: success
+deactivate vm
+page ->> user: "Película guardada"
+page ->> page: Actualizar UI (quitar de resultados)
+
+note over vm
+  El ViewModel maneja:
+  1. Búsqueda en TMDB
+  2. Transformación de datos
+  3. Guardado en Backend
+  4. Actualización de estado
+end note
+
+@enduml
