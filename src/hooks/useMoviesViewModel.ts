@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Movie } from '../models/movie';
 import { URL_BACKEND } from '../services/environment';
-import { getPopularMovies } from '../services/tmdbService';
 import { applyFavoritesToMovies, isFavoriteMovie, setFavoriteMovie } from '../services/favoritesStore';
 
 interface UseMoviesViewModelReturn {
@@ -24,25 +23,12 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Función helper para deduplicar películas
-  const deduplicateMovies = (movies: Movie[]): Movie[] => {
-    const seen = new Set<string>();
-    return movies.filter(movie => {
-      const key = `${movie.title.toLowerCase().trim()}|${movie.year}`;
-      if (seen.has(key)) {
-        return false;
-      }
-      seen.add(key);
-      return true;
-    });
-  };
-
   // Cargar películas del backend
   const loadMovies = async () => {
     setLoading(true);
     setError(null);
     try {
-      // Cargar películas locales
+      // Cargar solo películas locales del backend
       const localResponse = await fetch(URL_BACKEND);
       if (!localResponse.ok) {
         throw new Error(`Error: ${localResponse.status}`);
@@ -63,46 +49,8 @@ export function useMoviesViewModel(): UseMoviesViewModelReturn {
           )
       );
 
-      // Intentar cargar TODAS las películas populares de TMDB
-      let allTmdbMovies: Movie[] = [];
-      try {
-        // Cargar múltiples páginas para obtener más películas
-        // TMDB devuelve 20 películas por página, cargaremos hasta 5 páginas (100 películas)
-        const maxPages = 5;
-        for (let page = 1; page <= maxPages; page++) {
-          try {
-            const popularMovies = await getPopularMovies(page);
-            allTmdbMovies = allTmdbMovies.concat(popularMovies);
-          } catch (pageErr) {
-            console.warn(`Error cargando página ${page} de TMDB:`, pageErr);
-            // Continuar con las páginas cargadas
-            break;
-          }
-        }
-        console.log(`Se cargaron ${allTmdbMovies.length} películas de TMDB`);
-      } catch (tmdbErr) {
-        console.warn('No se pudieron cargar películas de TMDB:', tmdbErr);
-        // Continuar con películas locales si TMDB falla
-      }
-
-      // Combinar y deduplicar: primero las locales, luego las de TMDB sin duplicados
-      const combinedMovies: Movie[] = [...localMovies];
-      
-      // Agregar películas de TMDB que no están en el catálogo
-      for (const tmdbMovie of allTmdbMovies) {
-        const alreadyExists = combinedMovies.some(
-          m => m.title.toLowerCase().trim() === tmdbMovie.title.toLowerCase().trim() &&
-               m.year === tmdbMovie.year
-        );
-        
-        if (!alreadyExists) {
-          combinedMovies.push(tmdbMovie);
-        }
-      }
-
-      // Aplicar deduplicación final para asegurar no hay duplicados
-      const finalMovies = deduplicateMovies(combinedMovies);
-      setMovies(applyFavoritesToMovies(finalMovies));
+      // Solo mostrar películas del backend local
+      setMovies(applyFavoritesToMovies(localMovies));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Error al cargar películas');
       console.error('Error loading movies:', err);

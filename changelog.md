@@ -3,6 +3,24 @@
 Todos los cambios notables en este proyecto se documentan en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/).
 
+## [2.0.3] - 2026-03-02
+
+### 🎬 Ampliación del Catálogo
+
+#### Datos de Muestra Expandidos
+- **`backend/models.py`**: Función `add_sample_movies()` actualizada
+  - **50 películas icónicas** de diversos géneros y épocas
+  - Incluye: Drama, Acción, Sci-Fi, Thriller, Animación, Comedia, Terror, Western, Musical
+  - Películas populares de TMDB con ratings 8.0+
+  - URLs de posters válidas desde TMDB CDN
+  - Base de datos limpia sin duplicados
+  - Películas destacadas: The Shawshank Redemption, The Godfather, Inception, Parasite, Joker, entre otras
+
+#### Limpieza de Datos
+- Eliminación de duplicados previos
+- Base de datos recreada con datos consistentes
+- Verificación de integridad automática
+
 ## [2.0.2] - 2026-03-02
 
 ### ✨ Mejoras de Sincronización
